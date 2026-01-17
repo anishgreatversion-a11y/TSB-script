@@ -1,0 +1,50 @@
+local btn = script.Parent
+local player = game.Players.LocalPlayer
+
+-- ✅ settings
+local cooldown = 0.8
+local dashPower = 70
+local dashTime = 0.18
+
+local canDash = true
+
+local function doCombo()
+	if not canDash then return end
+	canDash = false
+
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hum or not hrp then
+		canDash = true
+		return
+	end
+
+	-- ✅ jump instantly
+	hum.Jump = true
+	task.wait(0.05)
+
+	-- ✅ dash in camera direction (feels like shiftlock)
+	local cam = workspace.CurrentCamera
+	local look = cam.CFrame.LookVector
+	local flatLook = Vector3.new(look.X, 0, look.Z)
+
+	if flatLook.Magnitude < 0.1 then
+		flatLook = hrp.CFrame.LookVector
+	end
+
+	flatLook = flatLook.Unit
+
+	local bv = Instance.new("BodyVelocity")
+	bv.MaxForce = Vector3.new(1e5, 0, 1e5)
+	bv.Velocity = flatLook * dashPower
+	bv.Parent = hrp
+
+	task.wait(dashTime)
+	bv:Destroy()
+
+	task.wait(cooldown)
+	canDash = true
+end
+
+btn.Activated:Connect(doCombo)
