@@ -1,0 +1,33 @@
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager") -- Used for simulating keypresses
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+-- The "Instant Lethal" Sequence
+local function doInstantLethal()
+    -- 1. Trigger Move 2 (Lethal Whirlwind)
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Two, false, game)
+    task.wait(0.05) 
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Two, false, game)
+
+    -- 2. Wait for the specific timing (This varies by ping, usually ~0.8 to 1.1s)
+    -- You have to time this to the EXACT moment the final hit of move 2 lands
+    task.wait(0.95) 
+
+    -- 3. The "Instant" Tech (Frame Perfect Combo)
+    -- Jump + Dash + Camera Flick (Camera flick is handled by your mouse)
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game) -- Jump
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Q, false, game)     -- Dash
+    
+    task.wait(0.03) -- Tiny delay to ensure engine registers both
+    
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Q, false, game)
+end
+
+-- Bind to a key (e.g., "T" for Tech)
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.T then
+        doInstantLethal()
+    end
+end)
